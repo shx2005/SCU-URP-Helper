@@ -1,11 +1,21 @@
 from staticINF import *
-
 import requests
-# from PIL import Image
 import hashlib
 import ddddocr
 
-# def read_pwd()
+
+def encrypt(content: str) -> str:
+    """ encrypt
+    this func will return the encrypted password by double md5.
+    :param content: the password (no encrypt).
+    :return: an encrypted password string.
+    """
+    magicStr = "{Urp602019}"
+    res1 = hashlib.md5((content + magicStr).encode()).hexdigest()
+    res1 = hashlib.md5(res1.encode()).hexdigest()
+    res2 = hashlib.md5(content.encode()).hexdigest()
+    res2 = hashlib.md5(res2.encode()).hexdigest()
+    return res1 + "*" + res2
 
 
 def userlogin(_http_main: requests.session) -> requests.session:
@@ -15,7 +25,6 @@ def userlogin(_http_main: requests.session) -> requests.session:
     :return: a requests session which has been updated.
     """
     ocr: ddddocr.DdddOcr = ddddocr.DdddOcr()
-    # usernameread_pwd()
 
     login_attempts = 0  # 追踪登录尝试次数
     while login_attempts < 100:
@@ -27,12 +36,8 @@ def userlogin(_http_main: requests.session) -> requests.session:
         token = res.text[token_pos + 37: token_pos + 69]
         print_log(token)
 
-        magicStr = "{Urp602019}"
-        # username = UserName
         # update: jwc has updated the logic of login.
-        # password = hashlib.md5(PassWord.encode()).hexdigest()
-        password = hashlib.md5((PassWord + magicStr).encode()).hexdigest() + '*' + \
-            hashlib.md5(hashlib.md5(PassWord.encode()).hexdigest().encode()).hexdigest()
+        password = encrypt(PassWord)
         code_photo = _http_main.get(captcha_url, headers=http_head)
         with open("code.jpg", "wb") as photo:
             photo.write(code_photo.content)
