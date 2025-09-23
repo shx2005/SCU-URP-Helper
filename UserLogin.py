@@ -33,11 +33,9 @@ def userlogin(_http_main: requests.session) -> requests.session:
         # password = hashlib.md5(PassWord.encode()).hexdigest()
         password = hashlib.md5((PassWord + magicStr).encode()).hexdigest() + '*' + \
             hashlib.md5(hashlib.md5(PassWord.encode()).hexdigest().encode()).hexdigest()
-        # print(hashlib.md5(PassWord.encode()))
         code_photo = _http_main.get(captcha_url, headers=http_head)
         with open("code.jpg", "wb") as photo:
             photo.write(code_photo.content)
-            print(code_photo.content)
             photo.close()
         image = code_photo.content
         code = ocr.classification(image)
